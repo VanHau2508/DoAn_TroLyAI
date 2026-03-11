@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Môn học - Trợ lý Sinh viên AI</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-back {
+            padding: 8px 20px;
+            background: #6B7280;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #4B5563;
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #111827;
+        }
+
+        .btn-add {
+            padding: 12px 24px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        /* Subjects Grid */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .subject-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border-left: 5px solid #4F46E5;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .subject-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+
+        .subject-code {
+            font-size: 14px;
+            color: #6B7280;
+            background: #F3F4F6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .subject-description {
+            color: #6B7280;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            min-height: 40px;
+        }
+
+        .subject-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .subject-credits {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .subject-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #059669;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            color: #111827;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6B7280;
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #111827;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-submit, .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #4338CA;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: #E5E7EB;
+            color: #111827;
+        }
+
+        .btn-cancel:hover {
+            background: #D1D5DB;
+        }
+
+        /* Loading & Empty States */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #6B7280;
+            margin-bottom: 25px;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border-left: 4px solid #10B981;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-left: 4px solid #EF4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="dashboard.html" class="navbar-brand">🎓 Trợ lý Sinh viên AI</a>
+            <div class="navbar-user">
+                <a href="dashboard.html" class="btn-back">← Về Dashboard</a>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Alert -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📚 Quản lý Môn học</h1>
+            <button class="btn-add" onclick="openAddModal()">+ Thêm môn học</button>
+        </div>
+
+        <!-- Subjects Grid -->
+        <div id="subjectsContainer">
+            <div class="loading">Đang tải danh sách môn học...</div>
+        </div>
+    </div>
+
+    <!-- Modal Add/Edit Subject -->
+    <div id="subjectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm môn học mới</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="subjectForm">
+                <input type="hidden" id="subjectId">
+
+                <div class="form-group">
+                    <label for="subjectName">Tên môn học <span style="color: red;">*</span></label>
+                    <input 
+                        type="text" 
+                        id="subjectName" 
+                        placeholder="Ví dụ: Lập trình Python"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="subjectDescription">Mô tả</label>
+                    <textarea 
+                        id="subjectDescription" 
+                        placeholder="Mô tả ngắn gọn về môn học..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="subjectCredits">Số tín chỉ <span style="color: red;">*</span></label>
+                    <select id="subjectCredits" required>
+                        <option value="1">1 tín chỉ</option>
+                        <option value="2">2 tín chỉ</option>
+                        <option value="3" selected>3 tín chỉ</option>
+                        <option value="4">4 tín chỉ</option>
+                        <option value="5">5 tín chỉ</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Thêm môn học</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        let currentUser = JSON.parse(localStorage.getItem('student_user'));
+        let editingSubjectId = null;
+
+        // Check login
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                localStorage.removeItem('student_user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Load subjects
+        async function loadSubjects() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/subjects/student/${currentUser.MASV}`);
+                const data = await response.json();
+
+                console.log('📚 Subjects data:', data);
+
+                const container = document.getElementById('subjectsContainer');
+
+                if (!data.success || data.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📚</div>
+                            <h3>Chưa có môn học nào</h3>
+                            <p>Bắt đầu thêm môn học để quản lý lịch học và deadline!</p>
+                            <button class="btn-add" onclick="openAddModal()">+ Thêm môn học đầu tiên</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="subjects-grid">
+                        ${data.data.map(subject => `
+                            <div class="subject-card">
+                                <div class="subject-header">
+                                    <div>
+                                        <div class="subject-title">${subject.TENMH}</div>
+                                        <span class="subject-code">${subject.MAMH}</span>
+                                    </div>
+                                </div>
+                                <div class="subject-description">
+                                    ${subject.MOTA || '<i style="color: #9CA3AF;">Chưa có mô tả</i>'}
+                                </div>
+                                <div class="subject-info">
+                                    <div class="subject-credits">
+                                        <span>📖</span>
+                                        <span>${subject.SO_TIN_CHI} tín chỉ</span>
+                                    </div>
+                                </div>
+                                <div class="subject-actions">
+                                    <button class="btn-edit" onclick="editSubject('${subject.MAMH}')">✏️ Sửa</button>
+                                    <button class="btn-delete" onclick="deleteSubject('${subject.MAMH}', '${subject.TENMH}')">🗑️ Xóa</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+                document.getElementById('subjectsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Lỗi tải dữ liệu</h3>
+                        <p>Không thể kết nối đến server. Vui lòng kiểm tra kết nối!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Open Add Modal
+        function openAddModal() {
+            editingSubjectId = null;
+            document.getElementById('modalTitle').textContent = 'Thêm môn học mới';
+            document.getElementById('submitBtn').textContent = 'Thêm môn học';
+            document.getElementById('subjectForm').reset();
+            document.getElementById('subjectModal').classList.add('active');
+        }
+
+        // Edit Subject
+        async function editSubject(maMH) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/subjects/${maMH}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    editingSubjectId = maMH;
+                    document.getElementById('modalTitle').textContent = 'Sửa thông tin môn học';
+                    document.getElementById('submitBtn').textContent = 'Cập nhật';
+                    document.getElementById('subjectName').value = data.data.TENMH;
+                    document.getElementById('subjectDescription').value = data.data.MOTA || '';
+                    document.getElementById('subjectCredits').value = data.data.SO_TIN_CHI;
+                    document.getElementById('subjectModal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error loading subject:', error);
+                showAlert('Lỗi tải thông tin môn học!', 'error');
+            }
+        }
+
+        // Delete Subject
+        async function deleteSubject(maMH, tenMH) {
+            if (!confirm(`Bạn có chắc muốn xóa môn học "${tenMH}"?\n\nLưu ý: Lịch học, lịch thi và deadline liên quan sẽ bị ảnh hưởng!`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/subjects/${maMH}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('✅ Xóa môn học thành công!', 'success');
+                    loadSubjects();
+                } else {
+                    showAlert('❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting subject:', error);
+                showAlert('❌ Lỗi khi xóa môn học!', 'error');
+            }
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('subjectModal').classList.remove('active');
+            document.getElementById('subjectForm').reset();
+            editingSubjectId = null;
+        }
+
+        // Submit Form
+        document.getElementById('subjectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
+
+            const formData = {
+                ma_sv: currentUser.MASV,
+                ten_mh: document.getElementById('subjectName').value,
+                mo_ta: document.getElementById('subjectDescription').value,
+                so_tin_chi: parseInt(document.getElementById('subjectCredits').value)
+            };
+
+            try {
+                let response;
+
+                if (editingSubjectId) {
+                    // Update
+                    response = await fetch(`${API_BASE_URL}/api/subjects/${editingSubjectId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    // Create
+                    response = await fetch(`${API_BASE_URL}/api/subjects`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(editingSubjectId ? '✅ Cập nhật môn học thành công!' : '✅ Thêm môn học thành công!', 'success');
+                    closeModal();
+                    loadSubjects();
+                } else {
+                    showAlert('❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showAlert('❌ Lỗi khi lưu môn học!', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('subjectModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Load subjects on page load
+        loadSubjects();
+
+        console.log('✅ Subjects page loaded!');
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Core AI Libraries (Updated for Python 3.12)
+transformers==4.46.0
+torch==2.5.1
+sentence-transformers==3.3.1
+
+# RAG & Vector Database
+langchain==0.3.13
+langchain-community==0.3.13
+langchain-core==0.3.28
+chromadb==0.5.23
+faiss-cpu==1.9.0.post1
+
+# LLM APIs
+openai==1.59.5
+google-generativeai==0.8.3
+
+# Utilities
+numpy==1.26.4
+pandas==2.2.3
+tqdm==4.67.1
+python-dotenv==1.0.1
+
+# Additional dependencies
+pydantic==2.10.4
+pydantic-settings==2.7.0
+requests==2.32.3

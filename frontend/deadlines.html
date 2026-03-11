@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Deadline - Trợ lý Sinh viên AI</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-back {
+            padding: 8px 20px;
+            background: #6B7280;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #4B5563;
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #111827;
+        }
+
+        .btn-add {
+            padding: 12px 24px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border-left: 4px solid #10B981;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-left: 4px solid #EF4444;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+            color: #6B7280;
+            transition: all 0.3s;
+        }
+
+        .filter-tab:hover {
+            background: #F3F4F6;
+            color: #111827;
+        }
+
+        .filter-tab.active {
+            background: #4F46E5;
+            color: white;
+        }
+
+        /* Deadlines List */
+        .deadlines-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .deadline-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #F59E0B;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .deadline-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .deadline-card.completed {
+            border-left-color: #10B981;
+            opacity: 0.7;
+        }
+
+        .deadline-card.urgent {
+            border-left-color: #EF4444;
+        }
+
+        .deadline-card.completed .deadline-title {
+            text-decoration: line-through;
+            color: #6B7280;
+        }
+
+        .deadline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .deadline-info {
+            flex: 1;
+        }
+
+        .deadline-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .deadline-subject {
+            display: inline-block;
+            background: #EEF2FF;
+            color: #4F46E5;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .deadline-description {
+            color: #6B7280;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .deadline-meta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .deadline-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .deadline-date.urgent {
+            color: #EF4444;
+            font-weight: 600;
+        }
+
+        .deadline-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .deadline-status.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .deadline-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .deadline-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-complete,
+        .btn-edit,
+        .btn-delete {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-complete {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #059669;
+        }
+
+        .btn-complete:disabled {
+            background: #D1D5DB;
+            cursor: not-allowed;
+        }
+
+        .btn-edit {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563EB;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #6B7280;
+            margin-bottom: 25px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            color: #111827;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6B7280;
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #111827;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #4338CA;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: #E5E7EB;
+            color: #111827;
+        }
+
+        .btn-cancel:hover {
+            background: #D1D5DB;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+            font-size: 18px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .deadline-header {
+                flex-direction: column;
+            }
+
+            .deadline-actions {
+                width: 100%;
+                justify-content: flex-start;
+                margin-top: 15px;
+            }
+
+            .filter-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="dashboard.html" class="navbar-brand">🎓 Trợ lý Sinh viên AI</a>
+            <div class="navbar-user">
+                <a href="dashboard.html" class="btn-back">← Về Dashboard</a>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Alert -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>⏰ Quản lý Deadline</h1>
+            <button class="btn-add" onclick="openAddModal()">+ Thêm deadline</button>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all" onclick="filterDeadlines('all')">
+                📋 Tất cả (<span id="countAll">0</span>)
+            </button>
+            <button class="filter-tab" data-filter="pending" onclick="filterDeadlines('pending')">
+                ⏰ Chưa hoàn thành (<span id="countPending">0</span>)
+            </button>
+            <button class="filter-tab" data-filter="completed" onclick="filterDeadlines('completed')">
+                ✅ Đã hoàn thành (<span id="countCompleted">0</span>)
+            </button>
+            <button class="filter-tab" data-filter="urgent" onclick="filterDeadlines('urgent')">
+                🔥 Sắp hết hạn (<span id="countUrgent">0</span>)
+            </button>
+        </div>
+
+        <!-- Deadlines List -->
+        <div id="deadlinesContainer">
+            <div class="loading">Đang tải danh sách deadline...</div>
+        </div>
+    </div>
+
+    <!-- Modal Add/Edit Deadline -->
+    <div id="deadlineModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm deadline mới</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="deadlineForm">
+                <input type="hidden" id="deadlineId">
+
+                <div class="form-group">
+                    <label for="subjectSelect">Môn học <span style="color: red;">*</span></label>
+                    <select id="subjectSelect" required>
+                        <option value="">-- Chọn môn học --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="deadlineTitle">Tiêu đề <span style="color: red;">*</span></label>
+                    <input 
+                        type="text" 
+                        id="deadlineTitle" 
+                        placeholder="Ví dụ: Bài tập lớn tuần 5"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="deadlineDescription">Mô tả</label>
+                    <textarea 
+                        id="deadlineDescription" 
+                        placeholder="Mô tả chi tiết về deadline..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="deadlineDate">Hạn nộp <span style="color: red;">*</span></label>
+                    <input 
+                        type="datetime-local" 
+                        id="deadlineDate" 
+                        required
+                    >
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Thêm deadline</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+    const API_BASE_URL = 'http://localhost:5000';
+    let currentUser = JSON.parse(localStorage.getItem('student_user'));
+    let editingDeadlineId = null;
+    let subjects = [];
+    let deadlines = [];
+    let currentFilter = 'all';
+
+    if (!currentUser) {
+        window.location.href = 'index.html';
+    }
+
+    function logout() {
+        if (confirm('Bạn có chắc muốn đăng xuất?')) {
+            localStorage.removeItem('student_user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    function showAlert(message, type = 'success') {
+        const alert = document.getElementById('alert');
+        alert.className = `alert alert-${type} show`;
+        alert.textContent = message;
+
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+    }
+
+    // Load subjects
+    async function loadSubjects() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/subjects/student/${currentUser.MASV}`);
+            const data = await response.json();
+
+            if (data.success) {
+                subjects = data.data;
+                const select = document.getElementById('subjectSelect');
+                select.innerHTML = '<option value="">-- Chọn môn học --</option>';
+                
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.MAMH;
+                    option.textContent = subject.TENMH;
+                    select.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading subjects:', error);
+        }
+    }
+
+    // Load deadlines
+    async function loadDeadlines() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/deadlines/student/${currentUser.MASV}`);
+            const data = await response.json();
+
+            console.log('⏰ Deadlines data:', data);
+
+            if (data.success) {
+                deadlines = data.data;
+                updateCounts();
+                renderDeadlines();
+            }
+        } catch (error) {
+            console.error('Error loading deadlines:', error);
+            document.getElementById('deadlinesContainer').innerHTML = `
+                <div class="loading">❌ Lỗi tải danh sách deadline</div>
+            `;
+        }
+    }
+
+    // Update counts
+    function updateCounts() {
+        const all = deadlines.length;
+        
+        // ✅ FIX: Convert to Number để so sánh
+        const pending = deadlines.filter(d => Number(d.TRANG_THAI) === 0).length;
+        const completed = deadlines.filter(d => Number(d.TRANG_THAI) === 1).length;
+        
+        // Urgent: Chưa hoàn thành VÀ còn <= 3 ngày
+        const urgent = deadlines.filter(d => {
+            if (Number(d.TRANG_THAI) === 1) return false; // ✅ Convert to Number
+            
+            const dueDate = new Date(d.NGAY_NOP);
+            const today = new Date();
+            const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+            
+            return diffDays <= 3 && diffDays >= 0;
+        }).length;
+
+        document.getElementById('countAll').textContent = all;
+        document.getElementById('countPending').textContent = pending;
+        document.getElementById('countCompleted').textContent = completed;
+        document.getElementById('countUrgent').textContent = urgent;
+        
+        console.log('📊 Counts updated:', { all, pending, completed, urgent });
+        console.log('📊 Deadlines TRANG_THAI types:', deadlines.map(d => ({
+            MADL: d.MADL,
+            TRANG_THAI: d.TRANG_THAI,
+            type: typeof d.TRANG_THAI
+        })));
+    }
+
+    // Filter deadlines
+    function filterDeadlines(filter) {
+        currentFilter = filter;
+        
+        // Update active tab
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+        
+        renderDeadlines();
+    }
+
+    // Render deadlines
+    function renderDeadlines() {
+        const container = document.getElementById('deadlinesContainer');
+
+        let filtered = [...deadlines]; // Copy array
+
+        if (currentFilter === 'pending') {
+            filtered = deadlines.filter(d => Number(d.TRANG_THAI) === 0);
+        } else if (currentFilter === 'completed') {
+            filtered = deadlines.filter(d => Number(d.TRANG_THAI) === 1);
+        } else if (currentFilter === 'urgent') {
+            filtered = deadlines.filter(d => {
+                if (Number(d.TRANG_THAI) === 1) return false;
+                
+                const dueDate = new Date(d.NGAY_NOP);
+                const today = new Date();
+                const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                
+                return diffDays <= 3 && diffDays >= 0;
+            });
+        }
+
+        // Sort by date
+        filtered.sort((a, b) => new Date(a.NGAY_NOP) - new Date(b.NGAY_NOP));
+
+        console.log(`🔍 Filter: ${currentFilter}, Total: ${deadlines.length}, Filtered: ${filtered.length}`);
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <h3>Không có deadline nào</h3>
+                    <p>${getEmptyMessage()}</p>
+                    ${currentFilter === 'all' ? '<button class="btn-add" onclick="openAddModal()">+ Thêm deadline đầu tiên</button>' : ''}
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="deadlines-container">
+                ${filtered.map(deadline => {
+                    const dueDate = new Date(deadline.NGAY_NOP);
+                    const today = new Date();
+                    const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                    const isUrgent = diffDays <= 3 && diffDays >= 0 && Number(deadline.TRANG_THAI) === 0;
+                    const isCompleted = Number(deadline.TRANG_THAI) === 1;
+
+                    return `
+                        <div class="deadline-card ${isCompleted ? 'completed' : ''} ${isUrgent ? 'urgent' : ''}">
+                            <div class="deadline-header">
+                                <div class="deadline-info">
+                                    <div class="deadline-title">${deadline.TIEU_DE}</div>
+                                    <span class="deadline-subject">📚 ${deadline.TENMH || 'Môn học'}</span>
+                                    ${deadline.MO_TA ? `<div class="deadline-description">${deadline.MO_TA}</div>` : ''}
+                                    <div class="deadline-meta">
+                                        <div class="deadline-date ${isUrgent ? 'urgent' : ''}">
+                                            📅 ${formatDate(deadline.NGAY_NOP)}
+                                            ${getDaysLeft(deadline.NGAY_NOP, deadline.TRANG_THAI)}
+                                        </div>
+                                        <span class="deadline-status ${isCompleted ? 'completed' : 'pending'}">
+                                            ${isCompleted ? '✅ Đã hoàn thành' : '⏰ Chưa hoàn thành'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="deadline-actions">
+                                    ${!isCompleted ? `
+                                        <button class="btn-complete" onclick="markCompleted('${deadline.MADL}')">
+                                            ✅ Hoàn thành
+                                        </button>
+                                    ` : ''}
+                                    <button class="btn-edit" onclick="editDeadline('${deadline.MADL}')">✏️ Sửa</button>
+                                    <button class="btn-delete" onclick="deleteDeadline('${deadline.MADL}', '${deadline.TIEU_DE}')">🗑️ Xóa</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function getEmptyMessage() {
+        switch(currentFilter) {
+            case 'pending': return 'Bạn không có deadline nào chưa hoàn thành!';
+            case 'completed': return 'Bạn chưa hoàn thành deadline nào!';
+            case 'urgent': return 'Không có deadline nào sắp hết hạn!';
+            default: return 'Bắt đầu thêm deadline để quản lý công việc!';
+        }
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function getDaysLeft(dateStr, status) {
+        if (Number(status) === 1) return '';
+        
+        const dueDate = new Date(dateStr);
+        const today = new Date();
+        const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+            return `<span style="color: #EF4444; font-weight: 600;">(Quá hạn ${Math.abs(diffDays)} ngày)</span>`;
+        } else if (diffDays === 0) {
+            return `<span style="color: #EF4444; font-weight: 600;">(Hôm nay!)</span>`;
+        } else if (diffDays === 1) {
+            return `<span style="color: #F59E0B; font-weight: 600;">(Ngày mai)</span>`;
+        } else if (diffDays <= 3) {
+            return `<span style="color: #F59E0B; font-weight: 600;">(Còn ${diffDays} ngày)</span>`;
+        } else if (diffDays <= 7) {
+            return `<span style="color: #10B981;">(Còn ${diffDays} ngày)</span>`;
+        } else {
+            return `<span style="color: #6B7280;">(Còn ${diffDays} ngày)</span>`;
+        }
+    }
+
+    // Mark as completed
+    async function markCompleted(maDL) {
+        console.log('📝 Marking deadline as completed:', maDL);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/deadlines/${maDL}/complete`, {
+                method: 'PUT'
+            });
+
+            const data = await response.json();
+            console.log('📥 Response:', data);
+
+            if (data.success) {
+                showAlert('✅ Đánh dấu hoàn thành thành công!', 'success');
+                
+                // ✅ RELOAD DEADLINES
+                console.log('🔄 Reloading deadlines...');
+                await loadDeadlines();
+                console.log('✅ Deadlines reloaded!');
+            } else {
+                showAlert('❌ ' + data.message, 'error');
+            }
+        } catch (error) {
+            console.error('❌ Error marking completed:', error);
+            showAlert('❌ Lỗi khi đánh dấu hoàn thành!', 'error');
+        }
+    }
+
+    function openAddModal() {
+        editingDeadlineId = null;
+        document.getElementById('modalTitle').textContent = 'Thêm deadline mới';
+        document.getElementById('submitBtn').textContent = 'Thêm deadline';
+        document.getElementById('deadlineForm').reset();
+        
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(23, 59);
+        document.getElementById('deadlineDate').value = tomorrow.toISOString().slice(0, 16);
+        
+        document.getElementById('deadlineModal').classList.add('active');
+    }
+
+    async function editDeadline(maDL) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/deadlines/${maDL}`);
+            const data = await response.json();
+
+            if (data.success) {
+                editingDeadlineId = maDL;
+                document.getElementById('modalTitle').textContent = 'Sửa deadline';
+                document.getElementById('submitBtn').textContent = 'Cập nhật';
+                
+                document.getElementById('subjectSelect').value = data.data.MAMH;
+                document.getElementById('deadlineTitle').value = data.data.TIEU_DE;
+                document.getElementById('deadlineDescription').value = data.data.MO_TA || '';
+                
+                const dueDate = new Date(data.data.NGAY_NOP);
+                document.getElementById('deadlineDate').value = dueDate.toISOString().slice(0, 16);
+                
+                document.getElementById('deadlineModal').classList.add('active');
+            }
+        } catch (error) {
+            console.error('Error loading deadline:', error);
+            showAlert('Lỗi tải thông tin deadline!', 'error');
+        }
+    }
+
+    async function deleteDeadline(maDL, tieuDe) {
+        if (!confirm(`Bạn có chắc muốn xóa deadline "${tieuDe}"?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/deadlines/${maDL}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert('✅ Xóa deadline thành công!', 'success');
+                loadDeadlines();
+            } else {
+                showAlert('❌ ' + data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting deadline:', error);
+            showAlert('❌ Lỗi khi xóa deadline!', 'error');
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('deadlineModal').classList.remove('active');
+        document.getElementById('deadlineForm').reset();
+        editingDeadlineId = null;
+    }
+
+    document.getElementById('deadlineForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Đang xử lý...';
+
+        // Parse datetime to SQL Server format
+        const dateTimeValue = document.getElementById('deadlineDate').value;
+        const dateTime = new Date(dateTimeValue);
+        const isoDateTime = dateTime.toISOString().slice(0, 19).replace('T', ' ');
+
+        const formData = {
+            ma_sv: currentUser.MASV,
+            ma_mh: document.getElementById('subjectSelect').value,
+            tieu_de: document.getElementById('deadlineTitle').value,
+            mo_ta: document.getElementById('deadlineDescription').value,
+            ngay_nop: isoDateTime
+        };
+
+        console.log('📤 Sending data:', formData);
+
+        try {
+            let response;
+
+            if (editingDeadlineId) {
+                response = await fetch(`${API_BASE_URL}/api/deadlines/${editingDeadlineId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+            } else {
+                response = await fetch(`${API_BASE_URL}/api/deadlines`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+            }
+
+            const data = await response.json();
+            console.log('📥 Response:', data);
+
+            if (data.success) {
+                showAlert(editingDeadlineId ? '✅ Cập nhật deadline thành công!' : '✅ Thêm deadline thành công!', 'success');
+                closeModal();
+                loadDeadlines();
+            } else {
+                showAlert('❌ ' + data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            showAlert('❌ Lỗi khi lưu deadline!', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
+
+    document.getElementById('deadlineModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Load data on page load
+    loadSubjects();
+    loadDeadlines();
+
+    console.log('✅ Deadlines page loaded!');
+    </script>
+</body>
+</html>

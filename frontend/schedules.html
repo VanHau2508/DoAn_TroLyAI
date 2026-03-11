@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thời khóa biểu - Trợ lý Sinh viên AI</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-back {
+            padding: 8px 20px;
+            background: #6B7280;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #4B5563;
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #111827;
+        }
+
+        .btn-add {
+            padding: 12px 24px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border-left: 4px solid #10B981;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-left: 4px solid #EF4444;
+        }
+
+        /* Calendar Table */
+        .calendar-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .calendar-table th {
+            background: #4F46E5;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .calendar-table th:first-child {
+            background: #3730A3;
+        }
+
+        .calendar-table td {
+            border: 1px solid #E5E7EB;
+            padding: 10px;
+            vertical-align: top;
+            min-height: 100px;
+            background: white;
+        }
+
+        .calendar-table td:first-child {
+            background: #F9FAFB;
+            font-weight: 600;
+            color: #4F46E5;
+            text-align: center;
+            width: 100px;
+        }
+
+        .time-slot {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* Schedule Item */
+        .schedule-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .schedule-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .schedule-item.color-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .schedule-item.color-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .schedule-item.color-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .schedule-item.color-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .schedule-item.color-5 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .schedule-item.color-6 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .schedule-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .schedule-time {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .schedule-room {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+
+        .schedule-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: none;
+            gap: 5px;
+        }
+
+        .schedule-item:hover .schedule-actions {
+            display: flex;
+        }
+
+        .btn-schedule-edit,
+        .btn-schedule-delete {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-schedule-edit:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-schedule-delete:hover {
+            background: rgba(239, 68, 68, 0.8);
+        }
+
+        /* Empty State */
+        .empty-cell {
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 14px;
+            padding: 30px 10px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            color: #111827;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6B7280;
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #111827;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #4338CA;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: #E5E7EB;
+            color: #111827;
+        }
+
+        .btn-cancel:hover {
+            background: #D1D5DB;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+            font-size: 18px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .calendar-table {
+                font-size: 14px;
+            }
+
+            .schedule-item {
+                padding: 8px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .calendar-container {
+                overflow-x: auto;
+            }
+
+            .calendar-table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="dashboard.html" class="navbar-brand">🎓 Trợ lý Sinh viên AI</a>
+            <div class="navbar-user">
+                <a href="dashboard.html" class="btn-back">← Về Dashboard</a>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Alert -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📅 Thời khóa biểu tuần</h1>
+            <button class="btn-add" onclick="openAddModal()">+ Thêm lịch học</button>
+        </div>
+
+        <!-- Calendar -->
+        <div class="calendar-container" id="calendarContainer">
+            <div class="loading">Đang tải thời khóa biểu...</div>
+        </div>
+    </div>
+
+    <!-- Modal Add/Edit Schedule -->
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm lịch học mới</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="scheduleForm">
+                <input type="hidden" id="scheduleId">
+
+                <div class="form-group">
+                    <label for="subjectSelect">Môn học <span style="color: red;">*</span></label>
+                    <select id="subjectSelect" required>
+                        <option value="">-- Chọn môn học --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="daySelect">Thứ <span style="color: red;">*</span></label>
+                    <select id="daySelect" required>
+                        <option value="2">Thứ 2</option>
+                        <option value="3">Thứ 3</option>
+                        <option value="4">Thứ 4</option>
+                        <option value="5">Thứ 5</option>
+                        <option value="6">Thứ 6</option>
+                        <option value="7">Thứ 7</option>
+                        <option value="8">Chủ nhật</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">Giờ bắt đầu <span style="color: red;">*</span></label>
+                    <input 
+                        type="time" 
+                        id="startTime" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">Giờ kết thúc <span style="color: red;">*</span></label>
+                    <input 
+                        type="time" 
+                        id="endTime" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="room">Phòng học</label>
+                    <input 
+                        type="text" 
+                        id="room" 
+                        placeholder="Ví dụ: A101, B203, ..."
+                    >
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Thêm lịch học</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        let currentUser = JSON.parse(localStorage.getItem('student_user'));
+        let editingScheduleId = null;
+        let subjects = [];
+        let schedules = [];
+
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                localStorage.removeItem('student_user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Time slots (7:30 - 17:30)
+        const timeSlots = [
+            '07:30 - 09:30',
+            '09:45 - 11:45',
+            '13:30 - 15:30',
+            '15:45 - 17:30'
+        ];
+
+        const days = [
+            { value: 2, label: 'Thứ 2' },
+            { value: 3, label: 'Thứ 3' },
+            { value: 4, label: 'Thứ 4' },
+            { value: 5, label: 'Thứ 5' },
+            { value: 6, label: 'Thứ 6' },
+            { value: 7, label: 'Thứ 7' },
+            { value: 8, label: 'CN' }
+        ];
+
+        // Load subjects for dropdown
+        async function loadSubjects() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/subjects/student/${currentUser.MASV}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    subjects = data.data;
+                    const select = document.getElementById('subjectSelect');
+                    select.innerHTML = '<option value="">-- Chọn môn học --</option>';
+                    
+                    subjects.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.MAMH;
+                        option.textContent = subject.TENMH;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+
+        // Load schedule
+        async function loadSchedule() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/schedules/student/${currentUser.MASV}`);
+                const data = await response.json();
+
+                console.log('📅 Schedule data:', data);
+
+                if (data.success) {
+                    schedules = data.data;
+                    renderCalendar();
+                }
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                document.getElementById('calendarContainer').innerHTML = `
+                    <div class="loading">❌ Lỗi tải thời khóa biểu</div>
+                `;
+            }
+        }
+
+        // Render calendar
+    function renderCalendar() {
+    const container = document.getElementById('calendarContainer');
+
+    let html = '<table class="calendar-table">';
+    
+    // Header
+    html += '<thead><tr><th>Giờ</th>';
+    days.forEach(day => {
+        html += `<th>${day.label}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    // Time slot definitions với giờ bắt đầu và kết thúc
+    const timeSlotRanges = [
+        { label: '07:30 - 09:30', start: '07:30', end: '09:30' },
+        { label: '09:45 - 11:45', start: '09:45', end: '11:45' },
+        { label: '13:30 - 15:30', start: '13:30', end: '15:30' },
+        { label: '15:45 - 17:30', start: '15:45', end: '17:30' }
+    ];
+
+    // Helper function: Check if schedule overlaps with time slot
+    function isScheduleInSlot(schedule, slotStart, slotEnd) {
+        // Convert time strings to minutes for easier comparison
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            const date = new Date(timeStr);
+            return date.getHours() * 60 + date.getMinutes();
+        }
+
+        function parseTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        const scheduleStart = timeToMinutes(schedule.GIO_BAT_DAU);
+        const scheduleEnd = timeToMinutes(schedule.GIO_KET_THUC);
+        const slotStartMin = parseTime(slotStart);
+        const slotEndMin = parseTime(slotEnd);
+
+        // Check overlap: schedule overlaps slot if:
+        // schedule starts before slot ends AND schedule ends after slot starts
+        return scheduleStart < slotEndMin && scheduleEnd > slotStartMin;
+    }
+
+    // Render each time slot
+    timeSlotRanges.forEach((slot, slotIndex) => {
+        html += `<tr><td class="time-slot">${slot.label}</td>`;
+        
+        // Render each day
+        days.forEach((day, dayIndex) => {
+            // Get schedules for this day
+            const daySchedules = schedules.filter(s => s.THU === day.value);
+            
+            // Filter schedules that overlap with this time slot
+            const slotSchedules = daySchedules.filter(schedule => 
+                isScheduleInSlot(schedule, slot.start, slot.end)
+            );
+            
+            html += '<td>';
+            
+            if (slotSchedules.length > 0) {
+                slotSchedules.forEach((schedule, index) => {
+                    const colorClass = `color-${(hashCode(schedule.MAMH) % 6) + 1}`;
+                    html += `
+                        <div class="schedule-item ${colorClass}" onclick="viewSchedule('${schedule.MALH}')">
+                            <div class="schedule-actions">
+                                <button class="btn-schedule-edit" onclick="event.stopPropagation(); editSchedule('${schedule.MALH}')">✏️</button>
+                                <button class="btn-schedule-delete" onclick="event.stopPropagation(); deleteSchedule('${schedule.MALH}', '${schedule.TENMH}')">🗑️</button>
+                            </div>
+                            <div class="schedule-title">${schedule.TENMH || 'Môn học'}</div>
+                            <div class="schedule-time">⏰ ${formatTime(schedule.GIO_BAT_DAU)} - ${formatTime(schedule.GIO_KET_THUC)}</div>
+                            <div class="schedule-room">📍 ${schedule.PHONG || 'Chưa có phòng'}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<div class="empty-cell">-</div>';
+            }
+            
+            html += '</td>';
+        });
+        
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+    // Helper function: Generate consistent color for same subject
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash);
+        }
+
+        function formatTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            const date = new Date(dateTimeStr);
+            return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function viewSchedule(maLH) {
+            const schedule = schedules.find(s => s.MALH === maLH);
+            if (schedule) {
+                alert(`📚 ${schedule.TENMH}\n⏰ ${formatTime(schedule.GIO_BAT_DAU)} - ${formatTime(schedule.GIO_KET_THUC)}\n📍 Phòng: ${schedule.PHONG || 'Chưa xác định'}`);
+            }
+        }
+
+        function openAddModal() {
+            editingScheduleId = null;
+            document.getElementById('modalTitle').textContent = 'Thêm lịch học mới';
+            document.getElementById('submitBtn').textContent = 'Thêm lịch học';
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('scheduleModal').classList.add('active');
+        }
+
+        async function editSchedule(maLH) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/schedules/${maLH}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    editingScheduleId = maLH;
+                    document.getElementById('modalTitle').textContent = 'Sửa lịch học';
+                    document.getElementById('submitBtn').textContent = 'Cập nhật';
+                    
+                    document.getElementById('subjectSelect').value = data.data.MAMH;
+                    document.getElementById('daySelect').value = data.data.THU;
+                    
+                    // Format time for input
+                    const startTime = new Date(data.data.GIO_BAT_DAU);
+                    const endTime = new Date(data.data.GIO_KET_THUC);
+                    
+                    document.getElementById('startTime').value = 
+                        `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
+                    document.getElementById('endTime').value = 
+                        `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                    
+                    document.getElementById('room').value = data.data.PHONG || '';
+                    
+                    document.getElementById('scheduleModal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                showAlert('Lỗi tải thông tin lịch học!', 'error');
+            }
+        }
+
+        async function deleteSchedule(maLH, tenMH) {
+            if (!confirm(`Bạn có chắc muốn xóa lịch học "${tenMH}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/schedules/${maLH}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('✅ Xóa lịch học thành công!', 'success');
+                    loadSchedule();
+                } else {
+                    showAlert('❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting schedule:', error);
+                showAlert('❌ Lỗi khi xóa lịch học!', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('scheduleModal').classList.remove('active');
+            document.getElementById('scheduleForm').reset();
+            editingScheduleId = null;
+        }
+
+        document.getElementById('scheduleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
+
+            const formData = {
+                ma_sv: currentUser.MASV,
+                ma_mh: document.getElementById('subjectSelect').value,
+                thu: parseInt(document.getElementById('daySelect').value),
+                gio_bat_dau: document.getElementById('startTime').value,
+                gio_ket_thuc: document.getElementById('endTime').value,
+                phong: document.getElementById('room').value
+            };
+
+            try {
+                let response;
+
+                if (editingScheduleId) {
+                    response = await fetch(`${API_BASE_URL}/api/schedules/${editingScheduleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE_URL}/api/schedules`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(editingScheduleId ? '✅ Cập nhật lịch học thành công!' : '✅ Thêm lịch học thành công!', 'success');
+                    closeModal();
+                    loadSchedule();
+                } else {
+                    showAlert('❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showAlert('❌ Lỗi khi lưu lịch học!', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        document.getElementById('scheduleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Load data
+        loadSubjects();
+        loadSchedule();
+
+        console.log('✅ Schedules page loaded!');
+    </script>
+</body>
+</html>
